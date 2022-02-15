@@ -6,6 +6,8 @@ import lombok.experimental.UtilityClass;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalTime;
+
 @UtilityClass
 public class ValidationUtil {
 
@@ -35,5 +37,12 @@ public class ValidationUtil {
     public static Throwable getRootCause(@NonNull Throwable t) {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);
         return rootCause != null ? rootCause : t;
+    }
+
+    public static void checkTime(LocalTime currentTime) {
+        LocalTime localTime = LocalTime.of(11, 0, 0);
+        if (currentTime.isAfter(localTime)) {
+            throw new IllegalRequestDataException("Current time=" + currentTime + " Time must be before 11");
+        }
     }
 }
