@@ -61,7 +61,7 @@ class DishControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(DISH_MATCHER.contentJson(dishRepository.findDishesByDate(RESTAURANT_ID, dish14.getMenuPerDay())));
+                .andExpect(DISH_MATCHER.contentJson(dishRepository.findDishesByDate(RESTAURANT_ID, dish2.getMenuPerDay())));
     }
 
     @Test
