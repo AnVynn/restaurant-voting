@@ -18,7 +18,7 @@ import java.io.Serializable;
 import java.util.*;
 
 @Entity
-@Table(name = "users", indexes = @Index(name = "users_unique_email_idx", columnList = "email", unique = true))
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
