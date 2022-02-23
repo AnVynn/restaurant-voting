@@ -82,6 +82,7 @@ public class VoteController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Vote> createWithLocation(@AuthenticationPrincipal AuthUser authUser, @RequestParam int restaurantId) {
         log.info("create vote by user id={} for restaurant id={}", authUser.id(), restaurantId);
 

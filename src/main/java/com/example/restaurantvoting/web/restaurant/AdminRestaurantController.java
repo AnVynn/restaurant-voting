@@ -2,6 +2,9 @@ package com.example.restaurantvoting.web.restaurant;
 
 import com.example.restaurantvoting.model.Restaurant;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +23,7 @@ import static com.example.restaurantvoting.util.validation.ValidationUtil.checkN
 @RestController
 @Slf4j
 @RequestMapping(value = AdminRestaurantController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+@CacheConfig(cacheNames = "restaurants")
 public class AdminRestaurantController extends AbstractRestaurantController {
 
     static final String REST_URL = "/api/admin/restaurants";
@@ -38,6 +42,7 @@ public class AdminRestaurantController extends AbstractRestaurantController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void delete(@PathVariable int id) {
         log.info("delete {}", id);
         repository.delete(id);
@@ -45,6 +50,7 @@ public class AdminRestaurantController extends AbstractRestaurantController {
 
     @Override
     @GetMapping
+    @Cacheable
     public List<Restaurant> getAll() {
         return super.getAll();
     }
@@ -57,6 +63,7 @@ public class AdminRestaurantController extends AbstractRestaurantController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void update(@RequestBody @Valid Restaurant restaurant, @PathVariable int id) {
         log.info("update {} with id={}", restaurant, id);
         assureIdConsistent(restaurant, id);
@@ -64,6 +71,8 @@ public class AdminRestaurantController extends AbstractRestaurantController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @CacheEvict(allEntries = true)
     public ResponseEntity<Restaurant> createWithLocation(@RequestBody @Valid Restaurant restaurant) {
         log.info("create {}", restaurant);
         checkNew(restaurant);

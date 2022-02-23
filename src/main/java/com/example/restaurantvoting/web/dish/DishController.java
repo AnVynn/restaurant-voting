@@ -5,6 +5,9 @@ import com.example.restaurantvoting.repository.DishRepository;
 import com.example.restaurantvoting.service.DishService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +27,7 @@ import static com.example.restaurantvoting.util.validation.ValidationUtil.checkN
 @Slf4j
 @RequestMapping(value = DishController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
+@CacheConfig(cacheNames = "dishes")
 public class DishController {
 
     static final String REST_URL = "/api/admin/restaurant/{restaurantId}/dishes";
@@ -33,6 +37,7 @@ public class DishController {
     private final DishService service;
 
     @GetMapping("/{id}")
+    @Cacheable
     public ResponseEntity<Dish> get(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("get dish with id={} for restaurant {}", id, restaurantId);
         return ResponseEntity.of(repository.get(id, restaurantId));
@@ -40,6 +45,7 @@ public class DishController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete dish with id={} for restaurant {}", id, restaurantId);
         Dish dish = repository.checkBelong(id, restaurantId);
@@ -60,6 +66,7 @@ public class DishController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE) //?
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void update(@RequestBody @Valid Dish dish, @PathVariable int restaurantId, @PathVariable int id) {
         log.info("update {} with id={} for restaurant {}", dish, id, restaurantId);
         assureIdConsistent(dish, id);
@@ -68,6 +75,8 @@ public class DishController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @CacheEvict(allEntries = true)
     public ResponseEntity<Dish> createWithLocation(@RequestBody @Valid Dish dish, @PathVariable int restaurantId) {
         log.info("create {} for restaurant {}", dish, restaurantId);
         checkNew(dish);
