@@ -6,6 +6,8 @@ import com.example.restaurantvoting.repository.VoteRepository;
 import com.example.restaurantvoting.to.RestaurantTo;
 import com.example.restaurantvoting.util.RestaurantUtil;
 import com.example.restaurantvoting.web.AuthUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +30,7 @@ import static com.example.restaurantvoting.util.validation.ValidationUtil.*;
 @Slf4j
 @RequestMapping(value = VoteController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
+@Tag(name = "VoteController", description = "Allows the user to vote for the restaurant")
 public class VoteController {
 
     static final String REST_URL = "/api/votes";
@@ -36,24 +39,28 @@ public class VoteController {
     private final RestaurantRepository restaurantRepository;
 
     @GetMapping
+    @Operation(summary = "Get all Votes for the restaurant by Current day")
     public List<Vote> getAll(@RequestParam int restaurantId) {
         log.info("getAll for restaurant id={}", restaurantId);
         return voteRepository.findVotesByRestaurant(restaurantId, LocalDate.now());
     }
 
     @GetMapping("/by-date/{localDate}")
+    @Operation(summary = "Get all Votes for the restaurant by Date")
     public List<Vote> getAllByDate(@RequestParam int restaurantId, @PathVariable ("localDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate localDate) {
         log.info("getAll by date={} for restaurant id={}", localDate, restaurantId);
         return voteRepository.findVotesByRestaurant(restaurantId, localDate);
     }
 
     @GetMapping("/count")
+    @Operation(summary = "Get the number of votes of the restaurant by Current date")
     public List<RestaurantTo> getAllCount(@RequestParam int restaurantId) {
         log.info("getAll count votes for restaurant id={}", restaurantId);
         return RestaurantUtil.getTos(voteRepository.findVotesByRestaurant(restaurantId, LocalDate.now()));
     }
 
     @GetMapping("/count/by-date/{localDate}")
+    @Operation(summary = "Get the number of votes of the restaurant by Date")
     public List<RestaurantTo> getAllCountByDate(@RequestParam int restaurantId, @PathVariable ("localDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate localDate) {
         log.info("getAll count votes by date={} for restaurant id={}", localDate, restaurantId);
         return RestaurantUtil.getTos(voteRepository.findVotesByRestaurant(restaurantId, localDate));
@@ -61,12 +68,14 @@ public class VoteController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete vote by Id")
     public void delete(@PathVariable int id) {
         log.info("delete vote by id={}", id);
         voteRepository.delete(id);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get vote by Id")
     public ResponseEntity<Vote> get(@AuthenticationPrincipal AuthUser authUser, @PathVariable int id) {
         log.info("get vote with id={} by user id={}", id, authUser.id());
         return ResponseEntity.of(voteRepository.findVoteByUser(id, authUser.id()));
@@ -74,6 +83,7 @@ public class VoteController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update vote by Id")
     public void update(@RequestBody @Valid Vote vote, @PathVariable int id) {
         log.info("update {} with id={}", vote, id);
         assureIdConsistent(vote, id);
@@ -83,6 +93,7 @@ public class VoteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create vote")
     public ResponseEntity<Vote> createWithLocation(@AuthenticationPrincipal AuthUser authUser, @RequestParam int restaurantId) {
         log.info("create vote by user id={} for restaurant id={}", authUser.id(), restaurantId);
 
