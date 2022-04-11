@@ -1,5 +1,5 @@
 INSERT INTO USERS (name, email, password)
-VALUES ('User', 'user@yandex.ru', '{noop}password'),
+VALUES ('User', 'user@gmail.com', '{noop}password'),
        ('Admin', 'admin@gmail.com', '{noop}admin'),
        ('User2', 'user2@gmail.com', '{noop}password2');
 
